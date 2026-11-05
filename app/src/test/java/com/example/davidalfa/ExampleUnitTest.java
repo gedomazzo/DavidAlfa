@@ -1,17 +1,18 @@
 package com.example.davidalfa;
 
 import org.junit.Test;
+import com.jjoe64.graphview.series.DataPoint;
 
 import static org.junit.Assert.*;
 
-/**
- * Example local unit test, which will execute on the development machine (host).
- *
- * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
- */
 public class ExampleUnitTest {
     @Test
-    public void addition_isCorrect() {
-        assertEquals(4, 2 + 2);
+    public void produceChart_test() {
+        DataPoint[] points = MainActivity.produceChart();
+        assertNotNull(points);
+        assertEquals(100, points.length);
+        for (int i = 0; i < points.length; i++) {
+            assertEquals((double) i, points[i].getX(), 0.0001);
+        }
     }
 }
