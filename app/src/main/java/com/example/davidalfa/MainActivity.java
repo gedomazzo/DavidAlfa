@@ -52,20 +52,20 @@ public class MainActivity extends AppCompatActivity{
 
         Intent shaw;
 
-        if (tit.equals("Ai")) {
-            //shaw = new Intent(this, Show.class);
-        } else if (tit.equals("IM")) {
-            //shaw = new Intent(this, Filter.class);
-        } else if (tit.equals("JSON")) {
-            //shaw = new Intent(this, Filter.class);
-        } else if (tit.equals("Sensor")) {
+        if (tit.equalsIgnoreCase("AI")) {
+            shaw = new Intent(this, AIActivity.class);
+        } else if (tit.equalsIgnoreCase("IM")) {
+            shaw = new Intent(this, AIActivity.class);
+        } else if (tit.equalsIgnoreCase("JSON")) {
+            shaw = new Intent(this, AIActivity.class);
+        } else if (tit.equalsIgnoreCase("Sensor")) {
             shaw = new Intent(this, SensorActivity.class);
-        } else if (tit.equals("Broadcast")) {
-            //shaw = new Intent(this, Filter.class);
+        } else if (tit.equalsIgnoreCase("Broadcast")) {
+            shaw = new Intent(this, BrodcasterActivity.class);
         } else {
             shaw = new Intent(this, MainActivity.class);
         }
-        //startActivity(shaw);
+        startActivity(shaw);
 
         return super.onOptionsItemSelected(item);
     }
