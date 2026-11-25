@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -20,25 +21,10 @@ import androidx.core.view.WindowInsetsCompat;
 
 public class BrodcasterActivity extends AppCompatActivity {
         private TextView conn;
-        private WiFiReciver wifiReceiver;
 
 
+        NetworkReciever receiver;
 
-        private BroadcastReceiver receiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                Log.d("MY_RECEIVER", "Broadcast received!");
-                String action = intent.getAction();
-
-                if (Intent.ACTION_POWER_CONNECTED.equals(action)) {
-                    conn.setText("Charger connected");
-                }
-
-                else if (Intent.ACTION_POWER_DISCONNECTED.equals(action)) {
-                    conn.setText("Charger disconnected");
-                } else conn.setText("connected");
-            }
-        };
         IntentFilter filter = new IntentFilter();
 
 
@@ -48,10 +34,10 @@ public class BrodcasterActivity extends AppCompatActivity {
             setContentView(R.layout.activity_brodcaster);
 
             conn = findViewById(R.id.conn);
+            receiver = new NetworkReciever(conn);
 
-
-            filter.addAction(Intent.ACTION_POWER_CONNECTED);
-            filter.addAction(Intent.ACTION_POWER_DISCONNECTED);
+            filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+            filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         }
 
         @Override
@@ -63,9 +49,11 @@ public class BrodcasterActivity extends AppCompatActivity {
 
     public void Start(View view) {
         registerReceiver(receiver, filter);
+        receiver.setLisening(true);
     }
 
     public void Finish(View view) {
         unregisterReceiver(receiver);
+        receiver.setLisening(false);
     }
 }
