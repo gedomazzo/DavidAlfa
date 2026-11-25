@@ -28,7 +28,15 @@ public class BrodcasterActivity extends AppCompatActivity {
             @Override
             public void onReceive(Context context, Intent intent) {
                 Log.d("MY_RECEIVER", "Broadcast received!");
-                conn.setText("started to charge");
+                String action = intent.getAction();
+
+                if (Intent.ACTION_POWER_CONNECTED.equals(action)) {
+                    conn.setText("Charger connected");
+                }
+
+                else if (Intent.ACTION_POWER_DISCONNECTED.equals(action)) {
+                    conn.setText("Charger disconnected");
+                } else conn.setText("connected");
             }
         };
         IntentFilter filter = new IntentFilter();
@@ -43,9 +51,7 @@ public class BrodcasterActivity extends AppCompatActivity {
 
 
             filter.addAction(Intent.ACTION_POWER_CONNECTED);
-
-            registerReceiver(receiver, filter);
-
+            filter.addAction(Intent.ACTION_POWER_DISCONNECTED);
         }
 
         @Override
@@ -56,10 +62,7 @@ public class BrodcasterActivity extends AppCompatActivity {
 
 
     public void Start(View view) {
-
         registerReceiver(receiver, filter);
-
-
     }
 
     public void Finish(View view) {

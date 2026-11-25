@@ -22,14 +22,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="Start"
-        android:text="Button" />
+        android:text="start" />
 
     <Button
         android:id="@+id/finish"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="Finish"
-        android:text="Button" />
+        android:text="finish" />
 
     <ListView
         android:id="@+id/data"
