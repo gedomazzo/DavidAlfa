@@ -11,9 +11,9 @@ import java.util.ArrayList;
 
 public class Gyro implements SensorEventListener {
     private float rx, ry, rz;
-    private final Sensor Gyroscope;
+    private Sensor gyroscope;
     private final SensorManager sensorManager;
-    private ArrayList<float[]> data;
+    private final ArrayList<float[]> data;
 
     TextView gyro;
 
@@ -23,16 +23,26 @@ public class Gyro implements SensorEventListener {
         this.ry = 0;
         this.rz = 0;
         this.sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-        this.Gyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+
+        // Try Gyroscope first, fallback to Accelerometer if unavailable on device/emulator
+        this.gyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+        if (this.gyroscope == null) {
+            this.gyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        }
 
         this.data = new ArrayList<>();
 
-        if (Gyroscope != null) {
-            sensorManager.registerListener(this, Gyroscope, SensorManager.SENSOR_DELAY_NORMAL);
+        if (gyro != null) {
+            gyro.setText("0.0 0.0 0.0");
         }
 
+        if (gyroscope != null) {
+            // SENSOR_DELAY_GAME delivers immediate updates (~20ms latency)
+            sensorManager.registerListener(this, gyroscope, SensorManager.SENSOR_DELAY_GAME);
+        } else if (gyro != null) {
+            gyro.setText("No sensor found!");
+        }
     }
-
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
@@ -40,17 +50,13 @@ public class Gyro implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent event) {
+        this.rx = Math.round(event.values[0] * 100) / 100f;
+        this.ry = Math.round(event.values[1] * 100) / 100f;
+        this.rz = Math.round(event.values[2] * 100) / 100f;
 
-        this.rx = Math.round(event.values[0]*100)/100;
-        this.ry = Math.round(event.values[1]*100)/100;
-        this.rz = Math.round(event.values[2]*100)/100;
-
-        float[] temp = {rx, ry, rz};
-
-        gyro.setText(String.valueOf(rx + " " + ry + " " + rz));
-
-
-
+        if (gyro != null) {
+            gyro.setText(rx + " " + ry + " " + rz);
+        }
     }
 
     public float getrX(){
@@ -65,15 +71,16 @@ public class Gyro implements SensorEventListener {
         return this.rz;
     }
 
-
-    public ArrayList<float[]> getData(){return this.data;}
-
+    public ArrayList<float[]> getData(){
+        return this.data;
+    }
 
     public void cleanData() {
         data.clear();
     }
 
-    public void stamp(){ float[] temp = {this.rx, this.ry, this.rz}; this.data.add(temp);}
-
-
+    public void stamp(){
+        float[] temp = {this.rx, this.ry, this.rz};
+        this.data.add(temp);
+    }
 }

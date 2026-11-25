@@ -4,20 +4,18 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowCompat;
-import androidx.core.view.WindowInsetsCompat;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class SensorActivity extends AppCompatActivity {
 
@@ -40,41 +38,57 @@ public class SensorActivity extends AppCompatActivity {
 
         sensor = new Gyro(this, gyro);
 
-        adapter = new ArrayAdapter<>(
+        Sdata = sensor.getData();
+        adapter = new ArrayAdapter<float[]>(
                 this,
                 android.R.layout.simple_list_item_1,
                 Sdata
-        );
+        ) {
+            @NonNull
+            @Override
+            public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+                View view = super.getView(position, convertView, parent);
+                TextView textView = view.findViewById(android.R.id.text1);
+                float[] item = getItem(position);
+                if (item != null && item.length >= 3) {
+                    textView.setText("X: " + item[0] + " | Y: " + item[1] + " | Z: " + item[2]);
+                } else if (item != null) {
+                    textView.setText(Arrays.toString(item));
+                }
+                return view;
+            }
+        };
         data.setAdapter(adapter);
     }
 
-    boolean state;
+    boolean state = false;
+
     public void Start(View view) {
-            state = true;
-            Thread thread = new Thread() {
-                @Override
-                public void run() {
+        if (state) return;
+        state = true;
+        sensor.cleanData();
+
+
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                while (state) {
                     sensor.stamp();
                     try {
-                        Thread.sleep(1000);
+                        Thread.sleep(500);
                     } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
+                        break;
                     }
                 }
-            };
-            thread.start();
-
-            Sdata = sensor.getData();
-            sensor.cleanData();
-            adapter.notifyDataSetChanged();
-            state = false;
-
+            }
+        };
+        thread.start();
     }
 
-    public void Finish(View view) {state = false; }
-
-
-
+    public void Finish(View view) {
+        state = false;
+        adapter.notifyDataSetChanged();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
@@ -95,13 +109,14 @@ public class SensorActivity extends AppCompatActivity {
         if (tit.equals("Ai")) {
             //shaw = new Intent(this, Show.class);
         } else if (tit.equals("IM")) {
-            //shaw = new Intent(this, Filter.class);
+            shaw = new Intent(this, AIActivity.class);
         } else if (tit.equals("JSON")) {
             //shaw = new Intent(this, Filter.class);
         } else if (tit.equals("Sensor")) {
             shaw = new Intent(this, SensorActivity.class);
         } else if (tit.equals("Broadcast")) {
-            //shaw = new Intent(this, Filter.class);
+            shaw = new Intent(this, BrodcasterActivity.class);
+            startActivity(shaw);
         } else {
             shaw = new Intent(this, MainActivity.class);
         }
